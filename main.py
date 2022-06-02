@@ -5,20 +5,25 @@ import util.blockchain
 import util.transaction
 
 
+print('\n\n\t\tVoting on a BlockChain\n\n')
+
 # the program random cause a validator block to cause return true take all transaction even if wrong as OK
 # this raised the validator block reputation to die
 
 #------------------
 # 1. first create userAccounts
+print('Creating User Base:')
+
 TotalNon_Contestants = 20
 TotalContestants = 3
 
 EC = helperModule.CreateUserBase(TotalNon_Contestants, TotalContestants)
 EC.DisplayFormattedUserProfiles(0)
 
+helperModule.PressEnterForNext()
 #------------------
 # 2. now create nodes
-
+print('Creating Nodes:')
 # the non-validators nodes should be more than validator nodes
 # the more the better to prevent 51% consensus attack
 # which is major problem in Blockchains esp. cryptocurrencies
@@ -29,6 +34,8 @@ TotalValidatorNodes = TotalContestants
 helperModule.CreateNodes(TotalNon_ValidtorNodes, TotalValidatorNodes, EC)
 
 EC.nodepool.DisplayNodes()
+
+helperModule.PressEnterForNext()
 #------------------
 # 3. now create a genesis block (starter block)
 # and add this to all blockchains
@@ -43,17 +50,21 @@ genesisBlock.hash = genesisBlock.GenerateHash()
 EC.nodepool.blockCounter += 1
 
 # display the genesis block
-print('Displaying a Block:')
+print('Created and Displaying the Genesis Block:')
 genesisBlock.Display()
 print('---------------------------------------------------')
+helperModule.PressEnterForNext()
 
 # now save this block to each nodes' blockchain
 for nodeID in EC.nodepool.nodes:
     EC.nodepool.nodes[nodeID].blockChain.AddBlock(genesisBlock)
 
+print('* Genesis Block Saved to Each Node')
+helperModule.PressEnterForNext()
 #------------------
 # 4. now create a custom mempool to UserBase for storing transactions
 # basically a MemPool sotres all the un-finished transaction, and as such is a technical name
+print('* Creating Transaction: SuperUser Distributing Votes to voters!')
 EC.mempool = mempool.MemPool()
 
 #------------------
@@ -79,6 +90,7 @@ for regisID in EC.users:
     EC.mempool.Add(txn)
 
 EC.mempool.DisplayTxns()
+helperModule.PressEnterForNext()
 print()
 # ----------------
 

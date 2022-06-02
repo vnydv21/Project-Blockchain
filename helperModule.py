@@ -119,7 +119,7 @@ def SolveMempool(uBase):
 
     # define the 50% of actual node count
     MinConcensusRequired = Nodepool.nodeCount/2
-
+    
     # keep doing transaction until mempool emtpy
     while len(Mempool.txns) > 0:
 
@@ -133,13 +133,16 @@ def SolveMempool(uBase):
         print('1. Packed a block, displaying:')
         block.Display()
         print()
-        
+
+        PressEnterForNext()
+
         print('2. Sent Block copy to each node.')
         # broadcast the block to all nodes
         for nodeID in Nodepool.nodes:
             node = Nodepool.nodes[nodeID]
             node.CatchBlock(block)
         
+        PressEnterForNext()
         print('------------------------------')
 
         # validator check-------------------------------------
@@ -148,8 +151,9 @@ def SolveMempool(uBase):
         validatorID = Nodepool.ChooseValidator(Nodepool.validatorNodes)
         print("\t Choosen Validator ID:", validatorID, 'Reputation:', Nodepool.nodes[validatorID].reputation)
 
-        # now ask the validator to verify the block
 
+        PressEnterForNext()
+        # now ask the validator to verify the block
         # let's store the wrong transactions seperately
         wrongTxns = []
 
@@ -160,6 +164,7 @@ def SolveMempool(uBase):
         print('\t\t Total Wrong Transactions:',len(wrongTxns))
         print('------------------------------')
 
+        PressEnterForNext()
         # let's create a consensus for wrong transaction by the block
         wrongTxnsDict = {i:1 for i in wrongTxns}
 
@@ -193,23 +198,27 @@ def SolveMempool(uBase):
 
         print("4. Consensus Results:")
         print('\t Has Validator Verified Block Correctly?', 'YES' if blockConcensus > MinConcensusRequired else 'NO')
+        PressEnterForNext()
 
         if wrongTxnsDict:
             print('------------------------------')
             print("\t Removing wrong Transaction...")
+            print()
             print("ID \t FromUser \tToUser")
+            print('-------------------------------------------')
             actuallyWrongTxnsCount = 0
             for txnID in wrongTxnsDict:                
                 if wrongTxnsDict[txnID] > MinConcensusRequired:
                     print(txnID, Mempool.txns[txnID].fromPublicKey, Mempool.txns[txnID].toPublicKey)
                     actuallyWrongTxnsCount += 1
                     Mempool.RemoveID(txnID)
-            print('\t\t Wrong Transactions Counted and Removed are:', actuallyWrongTxnsCount)
+            print()
+            print('\t Wrong Transactions Counted and Removed are:', actuallyWrongTxnsCount)
             print()
         else:
-            print('\t\t Wrong Transactions Counted and Removed are:', 0)
+            print('\t Wrong Transactions Counted and Removed are None.')
 
-        input('...?')
+        PressEnterForNext()
         
 
         # NOTE: One more limitation to note is that here a simulated version of
@@ -249,6 +258,7 @@ def SolveMempool(uBase):
             print('5.1 Destroyed the incorrect block, hence new block is:')
             block.Display()
             print('------------------------------')
+            PressEnterForNext()
 
         else:
             # link the broadcasted block to the blockchain
@@ -271,6 +281,8 @@ def SolveMempool(uBase):
             # this is ensured that the nodes don;t commit any fraud
             Nodepool.nodes[validatorID].reputation += 1
 
+        PressEnterForNext()
+
         print('------------------------------')
         print('7. Saving Block to each node')
         # now save the block to each node
@@ -283,6 +295,7 @@ def SolveMempool(uBase):
         print()
         print('7. The saved block is along with verified tranactions:')
         block.Display()
+        PressEnterForNext()
 
         # remove the completed txns from packed txns
         print('------------------------------')
@@ -294,6 +307,7 @@ def SolveMempool(uBase):
             uBase.CompleteTransaction(txn)
             Mempool.RemoveID(txn.id)
 
+        PressEnterForNext()
         print('------------------------------')
         print('UserInfo and Vote Balance')
         uBase.DisplayFormattedUserProfiles()
@@ -305,11 +319,13 @@ def SolveMempool(uBase):
         Nodepool.blockCounter += 1
 
         if len(Mempool.txns) > 0:
-            print('------------------------------')
-        
+            print('------------------------------')        
             Mempool.DisplayTxns()
             print('------------------------------\n')
 
         uBase.nodepool.DisplayNodes()
 
         input()
+
+def PressEnterForNext():
+    input('...\n')

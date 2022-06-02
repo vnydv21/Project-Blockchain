@@ -26,10 +26,12 @@ class MemPool:
 
     def DisplayTxns(self):
         print('Unfinished Transactions:')
-        print('ID \tfrom \tto \tamt \tSignatrue \tHash')
+
+        print("{0:2} {1:17} {2:17} {3:4} {4:64} {5}".format("ID", "from", "to", "amt", "Signature", "Hash"))
+        print('-'*140)
         for i in self.txns:            
             txn = self.txns[i]
-            print("{0} {1} {2} {3} {4} {5}".format(txn.id, txn.fromPublicKey, txn.toPublicKey, txn.amount ,txn.signature, txn.hash))
+            print("{0:2} {1:17} {2:17} {3:4} {4} {5}".format(txn.id, txn.fromPublicKey, txn.toPublicKey, txn.amount ,txn.signature, txn.hash))
                 
     def PackTransactions(self, blockId, n = 5):
 

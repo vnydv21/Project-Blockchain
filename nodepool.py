@@ -26,6 +26,7 @@ class NodePool:
 
         print()
         print('Validator Node ID:', self.validatorNodes)
+        print('Fraudulant Node ID:', self.fraudulantNodeID)
         print('---------------------------------------------------')
 
     def Add(self, node):
