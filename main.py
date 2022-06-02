@@ -10,8 +10,8 @@ import util.transaction
 
 #------------------
 # 1. first create userAccounts
-TotalNon_Contestants = 10
-TotalContestants = 2
+TotalNon_Contestants = 20
+TotalContestants = 3
 
 EC = helperModule.CreateUserBase(TotalNon_Contestants, TotalContestants)
 EC.DisplayFormattedUserProfiles(0)
@@ -102,7 +102,7 @@ for regisID in EC.users:
     # getRandom contestest
     constestentId = random.choice(EC.contestants)
     constestentPublicKey = EC.GetPublicKey(constestentId)
-    
+        
     txn = util.transaction.Transaction(EC.GetPublicKey(regisID), constestentPublicKey, 1)
     txn.SignTransaction(user)
     txn.hash = txn.GenerateHash()
@@ -112,12 +112,12 @@ for regisID in EC.users:
     
 # now add some fraudulant txns
 # now vote randomly to random party
-for regisID in random.sample(EC.users.keys(), 3):
+for regisID in random.sample(EC.users.keys(), 5):    
     if regisID == EC.superUserID: continue
     user = EC.users.get(regisID)
 
     # getRandom contestest
-    constestentId = random.choice(EC.contestants)
+    constestentId = random.choice(EC.contestants)    
     constestentPublicKey = EC.GetPublicKey(constestentId)
     
     txn = util.transaction.Transaction(EC.GetPublicKey(regisID), constestentPublicKey, 1)

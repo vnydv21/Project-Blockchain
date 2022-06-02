@@ -74,14 +74,13 @@ class Node:
 
                 # assume the fraudulant block carries out all the transactions without checking
                 if self.id == self.uBase.nodepool.fraudulantNodeID:
-                    UserBalanceList[userAid] -= amt
+                    continue
                 else:
                     if UserBalanceList[userAid] - amt < 0:
                         wrongTxns.append(txn.id)
                     else:
                         UserBalanceList[userAid] -= amt
                     
-
             else:
                 wrongTxns.append(txn.id)
                 

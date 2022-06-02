@@ -60,6 +60,7 @@ def CreateNodes(n,v, uBase):
         node.blockChain = util.blockchain.BlockChain(nodeID)
         
     # create the validator nodes
+    # out of validators one is fraudulant
     for i in range(v-1):
         # create a custom node
         node = util.node.Node(uBase)
@@ -74,19 +75,23 @@ def CreateNodes(n,v, uBase):
         node.reputation = 100
 
     # create the fradulant validator nodes
-    for i in range(1):
-        # create a custom node
-        node = util.node.Node(uBase)
-        nodeID = uBase.nodepool.Add(node)
+    # here it's only one
+    
+    # create a custom node
+    node = util.node.Node(uBase)
+    nodeID = uBase.nodepool.Add(node)
 
-        uBase.nodepool.validatorNodes.append(nodeID)
+    # make this a validator
+    uBase.nodepool.validatorNodes.append(nodeID)
 
-        # attach an empty blockchain to this node    
-        node.blockChain = util.blockchain.BlockChain(nodeID)
+    # attach an empty blockchain to this node    
+    node.blockChain = util.blockchain.BlockChain(nodeID)
 
-        # just any constant value
-        node.reputation = 100
-        uBase.nodepool.fraudulantNodeID = nodeID
+    # just any constant value
+    # let this to be high value
+    node.reputation = 120
+    uBase.nodepool.fraudulantNodeID = nodeID
+
 
 def DisplayWinner(uBase):
     contestantsID = []
@@ -180,58 +185,71 @@ def SolveMempool(uBase):
 
             # check if the validators transactions are wrong actual and take consensus
             # also add new wrong transactions if any
-            for w in thisWrongTxns:
-                if w in wrongTxnsDict:
-                    wrongTxnsDict[w] += 1
+            for txnID in thisWrongTxns:
+                if txnID in wrongTxnsDict:
+                    wrongTxnsDict[txnID] += 1
                 else:
-                    wrongTxnsDict[w] = 1
+                    wrongTxnsDict[txnID] = 1
 
         print("4. Consensus Results:")
-        print('\t Has Validator Verified Block Correctly?', 'YES' if validatorResult > MinConcensusRequired else 'NO')        
-        print('------------------------------')
-        print("\t Checking wrong Transaction...", end ='')
-        actuallyWrongTxnsCount = 0
-        for txnID in wrongTxnsDict:
-            if wrongTxnsDict[txnID] > MinConcensusRequired:
-                actuallyWrongTxnsCount += 1
-                Mempool.RemoveID(txnID)
-        print('\t\t Wrong Transactions counted are:', actuallyWrongTxnsCount)
-        print()
+        print('\t Has Validator Verified Block Correctly?', 'YES' if blockConcensus > MinConcensusRequired else 'NO')
+
+        if wrongTxnsDict:
+            print('------------------------------')
+            print("\t Removing wrong Transaction...")
+            print("ID \t FromUser \tToUser")
+            actuallyWrongTxnsCount = 0
+            for txnID in wrongTxnsDict:                
+                if wrongTxnsDict[txnID] > MinConcensusRequired:
+                    print(txnID, Mempool.txns[txnID].fromPublicKey, Mempool.txns[txnID].toPublicKey)
+                    actuallyWrongTxnsCount += 1
+                    Mempool.RemoveID(txnID)
+            print('\t\t Wrong Transactions Counted and Removed are:', actuallyWrongTxnsCount)
+            print()
+        else:
+            print('\t\t Wrong Transactions Counted and Removed are:', 0)
+
+        input('...?')
+        
 
         # NOTE: One more limitation to note is that here a simulated version of
         # node and block broadcasting is used, hence, this doesn't actually dispicted
         # the actual working of the blockchain, but a fair idea can be deduced.
 
-        # Also, important to note that if a block wrongly verify a block
+        # Also, important to note that if a node wrongly verify a block
         # then other nodes automatically (based on consensus) sends the right
         # block to each other
         # because the each node has it's own unique copy of the orignal block sent to them,
         # also a new block with all wrong transaction removed is sent to each, below.
 
-        # if there are wrong tranaction then create a new block
-        print('------------------------------')
-        print('Creating a new block for taking IN genuine transactions')
 
         if wrongTxnsDict:
-                Nodepool.blockCounter += 1
+            # if there are wrong tranaction then create a new block
+            print('------------------------------')
+            print('Creating a new block for taking IN genuine transactions')
+            Nodepool.blockCounter += 1
 
-                # the new Block
-                newBlockId = Nodepool.blockCounter
-                newBlock = util.blockchain.Block(newBlockId)
+            # the new Block
+            newBlockId = Nodepool.blockCounter
+            newBlock = util.blockchain.Block(newBlockId)
 
-                for txn in block.data:
-                    if txn in wrongTxnsDict: continue
+            for txn in block.data:
+                # since wrong txns are removed from mempool, hence check there first
+                # if not available => txns is invalid, hence don't include further
+                if txn in Mempool.txns:
                     newBlock.AddTransaction(txn)
 
-                # since the previous block is always verified and correct in each node, hence
-                # choose any node and get it's last block information
-                lastBlockID = Nodepool.nodes[0].blockChain.lastBlockId
-                newBlock.prevBlockHash = Nodepool.nodes[0].blockChain.blocks[lastBlockID].hash
-                newBlock.hash = newBlock.GenerateHash()
+            # since the previous block is always verified and correct in each node, hence
+            # choose any node and get it's last block information
+            lastBlockID = Nodepool.nodes[0].blockChain.lastBlockId
+            newBlock.prevBlockHash = Nodepool.nodes[0].blockChain.blocks[lastBlockID].hash
+            newBlock.hash = newBlock.GenerateHash()
 
-                block = newBlock
-                print('5.1 Destroyed the incorrect block, hence new block is:')
-                block.Display()
+            block = newBlock
+            print('5.1 Destroyed the incorrect block, hence new block is:')
+            block.Display()
+            print('------------------------------')
+
         else:
             # link the broadcasted block to the blockchain
             # since the previous block is always verified and correct in each node, hence
@@ -240,10 +258,10 @@ def SolveMempool(uBase):
             block.prevBlockHash = Nodepool.nodes[0].blockChain.blocks[lastBlockID].hash
             block.hash = block.GenerateHash()
 
-        print('------------------------------')
 
         # if the validator is wrong
-        if (validatorResult < MinConcensusRequired and validatorResult == 1) or (validatorResult > Nodepool.nodeCount/2 and validatorResult == 0):
+        # block WRONG but Validator show RIGHT or vice-versa
+        if (blockConcensus < MinConcensusRequired and validatorResult == 1) or (blockConcensus > MinConcensusRequired and validatorResult == 0):
             print('6. The Validator is cheater.')
             # put penalty to it, the penaly is just random some comparitively high value
             Nodepool.nodes[validatorID].reputation -= 10
@@ -252,7 +270,6 @@ def SolveMempool(uBase):
             # give repuation point, which is very less compared to the penalty
             # this is ensured that the nodes don;t commit any fraud
             Nodepool.nodes[validatorID].reputation += 1
-
 
         print('------------------------------')
         print('7. Saving Block to each node')
@@ -293,4 +310,6 @@ def SolveMempool(uBase):
             Mempool.DisplayTxns()
             print('------------------------------\n')
 
-        #input()
+        uBase.nodepool.DisplayNodes()
+
+        input()
