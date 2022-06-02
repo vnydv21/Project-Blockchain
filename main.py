@@ -151,3 +151,7 @@ helperModule.SolveMempool(EC)
 # 9. get the winner
 print('--------------------')
 helperModule.DisplayWinner(EC)
+
+print('--------------------')
+print('Program Finished')
+helperModule.PressEnterForNext()
