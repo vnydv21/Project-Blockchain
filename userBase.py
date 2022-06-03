@@ -5,13 +5,16 @@ import util.transaction as transaction
 
 class UserBase:
 
+    # repersents a char-set for generating pulblic or private keys from
     # X-> is just space
     BASE = "0123456789ABCDEFX"
-    # for 10k users
+    # for around 10K users, check how public-private encruyption is working
     PADDING = 5
 
     @staticmethod
     def INIT():
+        '''Always call this method when the module is imported'''
+        # init the static variables in transaction and user modules
         transaction.Transaction.PADDING = UserBase.PADDING
         transaction.Transaction.BASE = UserBase.BASE
 

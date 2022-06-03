@@ -1,9 +1,9 @@
 # define instruction
-import userBase
+import mempool
 import nodepool
+import userBase
 import util.node
 import util.blockchain
-import mempool
 import util.transaction
 
 # pre-initialise the module
@@ -111,6 +111,10 @@ def DisplayWinner(uBase):
         
 
 def SolveMempool(uBase):
+    '''Simulate the blockchain network by going through the transactions
+    in the mempool and creating and adding blocks to it
+    It stops when all transactions from the mempool are completed.'''
+
     print('--------------------------------------------------')
     print('Creating Blocks and finishing transactions:')
 

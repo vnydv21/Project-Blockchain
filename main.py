@@ -1,6 +1,6 @@
-import helperModule
-import nodepool
 import mempool
+import nodepool
+import helperModule
 import util.blockchain
 import util.transaction
 
