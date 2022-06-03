@@ -7,9 +7,6 @@ import util.transaction
 
 print('\n\n\t\tVoting on a BlockChain\n\n')
 
-# the program random cause a validator block to cause return true take all transaction even if wrong as OK
-# this raised the validator block reputation to die
-
 #------------------
 # 1. first create userAccounts
 print('Creating User Base:')
