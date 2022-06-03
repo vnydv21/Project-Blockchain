@@ -15,7 +15,7 @@ class Transaction:
         self.amount = amount
 
         # once created call the SignTransaction to sign this txn
-
+        self.signature = 0
         # the transaction has a hash consisting of all data
         # generated after signature is generated
         self.hash = 0

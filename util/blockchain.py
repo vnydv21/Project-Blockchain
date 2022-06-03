@@ -41,10 +41,12 @@ class Block:
         return hashlib.sha256(encoded).hexdigest()
 
     def AddTransaction(self, txn):
-        # add the copy of the transaction
+        '''add the copy of the transaction to this block
+        this doesn't verfiy but assumes it's verified.'''
         self.data.append(copy.deepcopy(txn))
 
     def Display(self):
+        '''prints the data of this block on console'''
 
         blockData = []
 
@@ -59,7 +61,6 @@ class Block:
         }
 
         print(json.dumps(blockData,indent=3))
-        return json.dumps(blockData,indent=3)
 
 
 class BlockChain:
