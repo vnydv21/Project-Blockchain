@@ -65,13 +65,8 @@ class Node:
 
                 if not userAid in UserBalanceList:
                     UserBalanceList[userAid] = userA.votePower
-                
-                '''
-                if userA.votePower - amt < 0:
-                    wrongTxns.append(txn.id)
-                '''
-                # temporarily store the transaction
 
+                # temporarily store the transaction
                 # assume the fraudulant block carries out all the transactions without checking
                 if self.id == self.uBase.nodepool.fraudulantNodeID:
                     continue
