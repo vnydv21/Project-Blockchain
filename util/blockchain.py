@@ -68,7 +68,6 @@ class BlockChain:
     def __init__(self, nodeId):
 
         self.nodeId = nodeId
-        self.id : int = 0
         
         self.lastBlockId : int = -1
 
